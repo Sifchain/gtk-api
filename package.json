@@ -1,6 +1,6 @@
 {
   "name": "@sifchain/gtk-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "repository": "https://github.com/Sifchain/gtk-api.git",
   "author": "Piotr Gesicki <piotr@sifchain.finance>",
