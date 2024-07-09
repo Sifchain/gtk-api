@@ -1,26 +1,26 @@
-# gtk-api
+# @sifchain/gtk-api
 
-The `gtk-api` package provides a wrapper for the internal API client to manage and execute trade operations. This README will guide you through the installation, usage, and API methods available in the package.
+The `@sifchain/gtk-api` package provides a wrapper for the internal API client to manage and execute trade operations. This README will guide you through the installation, usage, and API methods available in the package.
 
 ## Installation
 
-To install the `gtk-api` package, use the following command:
+To install the `@sifchain/gtk-api` package, use the following command:
 
 ```bash
-yarn add gtk-api
+yarn add @sifchain/gtk-api
 
 ```
 
 OR
 
 ```bash
-npm install gtk-api
+npm install @sifchain/gtk-api
 
 ```
 
 # Sample Repo
 
-Clone sample [repo](https://github.com/monilpat/gtk-api-sample) to use the API without having to create any boilerplate
+Clone sample [repo](https://github.com/Sifchain/gtk-api-sample) to use the API without having to create any boilerplate
 
 # Usage
 
@@ -31,7 +31,7 @@ currently only mainnet network is configured for API usage.
 
 ```typescript
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import { APIClientWrapper } from "gtk-api";
+import { APIClientWrapper } from "@sifchain/gtk-api";
 
 async function main() {
   const wallet = await DirectSecp256k1HdWallet.fromMnemonic("your-mnemonic");
@@ -259,7 +259,7 @@ import {
   PnlTypeEnum,
   TradeDirectionEnum,
   TradeStatusEnum,
-} from "gtk-api";
+} from "@sifchain/gtk-api";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 
 export async function main() {

@@ -6,7 +6,7 @@
 //   TargetTokenType,
 //   CollateralTokenType,
 //   DirectSecp256k1HdWallet,
-// } from "gtk-api";
+// } from "@sifchain/gtk-api";
 
 export async function main() {
   // // Initialize the APIClientWrapper
