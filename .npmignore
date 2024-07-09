@@ -1,0 +1,12 @@
+# Internal files
+
+# Test files
+/tests/
+
+# Exclude internal directories and implementation details
+.env
+.gitignore
+npm-debug.log
+
+# Exclude node_modules
+node_modules

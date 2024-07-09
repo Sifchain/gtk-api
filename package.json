@@ -1,0 +1,25 @@
+{
+  "name": "gtk-api",
+  "version": "1.1.8",
+  "main": "dist/index.js",
+  "repository": "https://github.com/monilpat/gtk-api.git",
+  "author": "Monil Patel <monilpat@gmail.com>",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@cosmjs/launchpad": "^0.27.1",
+    "@cosmjs/proto-signing": "^0.29.1",
+    "@cosmjs/stargate": "^0.29.1",
+    "@dydxprotocol/v4-client-js": "^1.0.20",
+    "@sifchain/sdk": "^1.0.0",
+    "@sifchain/stargate": "^0.0.0-snapshot.347710f",
+    "bignumber.js": "^9.1.1",
+    "lodash": "^4.17.21",
+    "nullthrows": "^1.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  }
+}

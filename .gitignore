@@ -1,0 +1,6 @@
+# Node modules
+node_modules/
+
+# Exclude internal directories and implementation details
+.DS_Store
+.env
