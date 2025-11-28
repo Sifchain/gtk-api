@@ -1,5 +1,4 @@
 // IAPIClient.ts
-import { DeliverTxResponse } from "@sifchain/sdk";
 import {
   CollateralTokenType,
   TargetTokenType,
@@ -7,6 +6,9 @@ import {
   TradeDirectionEnum,
   TradeStatusEnum,
 } from "./types";
+import { DeliverTxResponse } from "@sifchain/sdk";
+
+export type TxResult = DeliverTxResponse | { hash: string };
 
 export interface IAPIClient {
   placeOrder(
@@ -18,9 +20,9 @@ export interface IAPIClient {
     stopLoss: number | null,
     takeProfit: number | null,
     limitPrice: number | null
-  ): Promise<DeliverTxResponse | null>;
-  closeOrder(tradeId: number): Promise<DeliverTxResponse | null>;
-  cancelOrder(tradeId: number): Promise<DeliverTxResponse | null>;
+  ): Promise<TxResult | null>;
+  closeOrder(tradeId: number): Promise<TxResult | null>;
+  cancelOrder(tradeId: number): Promise<TxResult | null>;
   getCurrentInterestRate(targetTokenType: TargetTokenType): Promise<number>;
   getTrades(
     tradeType: TradeDirectionEnum | undefined,

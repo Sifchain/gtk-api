@@ -1,7 +1,6 @@
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import { IAPIClient } from "./IAPIClient";
+import { IAPIClient, TxResult } from "./IAPIClient";
 import { APIClient as InternalAPIClient } from "../internal/apiClient";
-import { DeliverTxResponse } from "@sifchain/sdk";
 import {
   CollateralTokenType,
   PnlTypeEnum,
@@ -10,6 +9,7 @@ import {
   TradeDirectionEnum,
   TradeStatusEnum,
 } from "./types";
+import { Wallet } from "ethers";
 
 /**
  * Wrapper for the internal API client to manage and execute trade operations.
@@ -55,10 +55,15 @@ export class APIClientWrapper implements IAPIClient {
    * @returns A promise that resolves to an APIClientWrapper instance.
    */
   static async create(
-    wallet: DirectSecp256k1HdWallet,
-    network: "mainnet" | "testnet"
+    wallet: DirectSecp256k1HdWallet | Wallet,
+    network: "mainnet" | "testnet",
+    options?: { chain?: "cosmos" | "base" }
   ): Promise<APIClientWrapper> {
-    const apiClient = await InternalAPIClient.create(wallet, network);
+    const apiClient = await InternalAPIClient.create(
+      wallet,
+      network,
+      options?.chain
+    );
     return new APIClientWrapper(apiClient);
   }
   /**
@@ -82,7 +87,7 @@ export class APIClientWrapper implements IAPIClient {
     stopLoss: number | null,
     takeProfit: number | null,
     limitPrice: number | null
-  ): Promise<DeliverTxResponse | null> {
+  ): Promise<TxResult | null> {
     return this.apiClient.placeOrder(
       tokenType,
       tokenAmount,
@@ -99,7 +104,7 @@ export class APIClientWrapper implements IAPIClient {
    * @param tradeId - The ID of the trade to close.
    * @returns A promise that resolves to the transaction response or null if failed.
    */
-  async closeOrder(tradeId: number): Promise<DeliverTxResponse | null> {
+  async closeOrder(tradeId: number): Promise<TxResult | null> {
     return this.apiClient.closeOrder(tradeId);
   }
   /**
@@ -107,7 +112,7 @@ export class APIClientWrapper implements IAPIClient {
    * @param tradeId - The ID of the trade to cancel.
    * @returns A promise that resolves to the transaction response or null if failed.
    */
-  async cancelOrder(tradeId: number): Promise<DeliverTxResponse | null> {
+  async cancelOrder(tradeId: number): Promise<TxResult | null> {
     return this.apiClient.cancelOrder(tradeId);
   }
   /**

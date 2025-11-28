@@ -54,6 +54,35 @@ async function main() {
 main();
 ```
 
+### Base (EVM) example (experimental)
+
+```typescript
+import { APIClientWrapper, TradeDirectionEnum } from "@sifchain/gtk-api";
+import { JsonRpcProvider, Wallet } from "ethers";
+
+async function main() {
+  const provider = new JsonRpcProvider(
+    process.env.BASE_RPC_URL ?? "https://mainnet.base.org"
+  );
+  const wallet = new Wallet(process.env.BASE_PRIVATE_KEY ?? "", provider);
+  const client = await APIClientWrapper.create(wallet, "mainnet", {
+    chain: "base",
+  });
+
+  const trade = await client.placeOrder(
+    "uusdc",
+    0.00001,
+    "btc",
+    TradeDirectionEnum.LONG,
+    2,
+    45000,
+    70000,
+    null
+  );
+  console.log("Base Place Order:", trade);
+}
+```
+
 # API Methods
 
 ## APIClientWrapper.create
@@ -64,6 +93,7 @@ Factory method to create an instance of APIClientWrapper.
 
 - wallet (DirectSecp256k1HdWallet): The wallet instance for signing transactions.
 - network (NetworkEnv): The network environment to connect to.
+- options (optional): `{ chain?: "cosmos" | "base" }`. Defaults to `"cosmos"`.
 
 ### Returns:
 

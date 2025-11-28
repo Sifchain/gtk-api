@@ -14,17 +14,9 @@ import {
   TradeDirectionEnum,
   TradeStatusEnum,
 } from "../api/types";
-import {
-  constructCookie,
-  fetchWithRetries,
-  getTokenRegistryEntry,
-} from "../apiUtils/apiUtils";
+import { constructCookie, fetchWithRetries } from "../apiUtils/apiUtils";
 import { IAPIClient } from "../api/IAPIClient";
 import {
-  getPrecisionForToken,
-  onCancelTradeRequestAPI,
-  onCloseTradeAPI,
-  onRequestATradeAPI,
   shouldCloseTrade,
   getEffectiveInterestRateForMarket,
 } from "../apiUtils/apiClientUtils";
@@ -33,43 +25,40 @@ import {
   indexerClient,
   initialized,
 } from "../apiUtils/dydxClients";
-import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import BigNumber from "bignumber.js";
-import nullthrows from "nullthrows";
-import { DeliverTxResponse } from "@sifchain/sdk";
+import { ChainAdapter, Chain, TxResult } from "./chainAdapters/types";
+import { createChainAdapter } from "./chainAdapters/factory";
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
+import { Wallet } from "ethers";
 
 export class APIClient implements IAPIClient {
-  private wallet: DirectSecp256k1HdWallet;
   private network: "mainnet" | "testnet";
-  private address: string | null = null;
-  private sifRpcUrl: string | null = null;
+  private address: string;
+  private chain: Chain;
+  private chainAdapter: ChainAdapter;
 
-  constructor(
-    wallet: DirectSecp256k1HdWallet,
-    address: string,
+  private constructor(
     network: "mainnet" | "testnet",
-    sifRpcUrl: string | null
+    chain: Chain,
+    chainAdapter: ChainAdapter,
+    address: string
   ) {
-    this.sifRpcUrl = sifRpcUrl;
-    this.wallet = wallet;
     this.network = network;
+    this.chain = chain;
+    this.chainAdapter = chainAdapter;
     this.address = address;
   }
   static async create(
-    wallet: DirectSecp256k1HdWallet,
-    network: "mainnet" | "testnet"
+    wallet: DirectSecp256k1HdWallet | Wallet,
+    network: "mainnet" | "testnet",
+    chain: Chain = "cosmos"
   ): Promise<APIClient> {
     if (!initialized) {
       await createClients(network);
     }
-    return new APIClient(
-      wallet,
-      (await wallet.getAccounts())[0].address,
-      network,
-      network === "testnet"
-        ? "https://proxies.sifchain.finance/api/sifchain-testnet/rpc"
-        : "https://proxies.sifchain.finance/api/sifchain-1/rpc"
-    );
+    const chainAdapter = createChainAdapter(wallet, chain, network);
+    const address = await chainAdapter.getAddress();
+    return new APIClient(network, chain, chainAdapter, address);
   }
   async placeOrder(
     tokenType: CollateralTokenType,
@@ -80,7 +69,7 @@ export class APIClient implements IAPIClient {
     stopLoss: number | null,
     takeProfit: number | null,
     limitPrice: number | null
-  ): Promise<DeliverTxResponse | null> {
+  ): Promise<TxResult | null> {
     const isInvalidLeverage = !(
       (BigNumber(leverage).isGreaterThanOrEqualTo(0) &&
         BigNumber(leverage).isLessThanOrEqualTo(
@@ -119,49 +108,36 @@ export class APIClient implements IAPIClient {
     if (shouldClose) {
       return null;
     }
-    const collateralTypeRegistryData = await getTokenRegistryEntry(
-      tokenType,
-      nullthrows(this?.sifRpcUrl)
-    );
-    const precision = getPrecisionForToken(collateralTypeRegistryData);
-    const txn = await onRequestATradeAPI(
-      this.wallet,
-      nullthrows(this?.address),
-      collateralTypeRegistryData.denom,
-      String(tokenAmount),
-      {
-        target_token_type: targetTokenType,
-        limit_price: limitPrice ? String(limitPrice) : null,
-        trade_direction: String(tradeDirection),
-        stop_loss: String(stopLoss),
-        take_profit: String(takeProfit),
-        leverage_quantity: String(leverage),
-      },
+    const precision = await this.chainAdapter.getPrecision(tokenType);
+    const txn = await this.chainAdapter.placeTrade({
+      collateralType: tokenType,
+      collateralAmount: tokenAmount,
+      targetTokenType,
+      tradeDirection,
+      leverage,
+      stopLoss,
+      takeProfit,
+      limitPrice,
       precision,
-      this?.sifRpcUrl!
-    );
+    });
     console.log("txn", txn);
     return txn;
   }
-  async closeOrder(tradeId: number): Promise<DeliverTxResponse | null> {
+  async closeOrder(tradeId: number): Promise<TxResult | null> {
     const trade = await this.getTrade(tradeId);
     if (trade == null) {
       return null;
     }
-    const txn = await onCloseTradeAPI(trade, this.wallet, this?.sifRpcUrl!);
+    const txn = await this.chainAdapter.closeTrade(trade);
     console.log("txn", txn);
     return txn;
   }
-  async cancelOrder(tradeId: number): Promise<DeliverTxResponse | null> {
+  async cancelOrder(tradeId: number): Promise<TxResult | null> {
     const trade = await this.getTrade(tradeId);
     if (trade == null) {
       return null;
     }
-    const txn = await onCancelTradeRequestAPI(
-      trade,
-      this.wallet,
-      this?.sifRpcUrl!
-    );
+    const txn = await this.chainAdapter.cancelTrade(trade);
     console.log("txn", txn);
     return txn;
   }

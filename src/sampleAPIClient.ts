@@ -7,6 +7,7 @@
 //   CollateralTokenType,
 //   DirectSecp256k1HdWallet,
 // } from "@sifchain/gtk-api";
+// import { JsonRpcProvider, Wallet } from "ethers";
 
 export async function main() {
   // // Initialize the APIClientWrapper
@@ -56,6 +57,26 @@ export async function main() {
   // // Call getPnl method
   // const pnl = await client.getPnl(PnlTypeEnum.REALIZED);
   // console.log("PnL:", pnl);
+
+  // // Base network example (requires Base RPC, contract, and addresses to be configured)
+  // const provider = new JsonRpcProvider(
+  //   process.env.BASE_RPC_URL ?? "https://mainnet.base.org"
+  // );
+  // const baseWallet = new Wallet(process.env.BASE_PRIVATE_KEY ?? "", provider);
+  // const baseClient = await APIClientWrapper.create(baseWallet, "mainnet", {
+  //   chain: "base",
+  // });
+  // const baseTrade = await baseClient.placeOrder(
+  //   "uusdc",
+  //   0.01,
+  //   "btc",
+  //   TradeDirectionEnum.LONG,
+  //   2,
+  //   45000,
+  //   70000,
+  //   null
+  // );
+  // console.log("Base Place Order:", baseTrade);
 }
 
 // Execute the main function

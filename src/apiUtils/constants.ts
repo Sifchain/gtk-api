@@ -346,6 +346,77 @@ export const DYDX_CONFIG = {
   },
 };
 
+export const SIF_RPC_URLS: Record<"mainnet" | "testnet", string> = {
+  mainnet: "https://proxies.sifchain.finance/api/sifchain-1/rpc",
+  testnet: "https://proxies.sifchain.finance/api/sifchain-testnet/rpc",
+};
+
+export type EvmChainConfig = {
+  rpcUrl: string;
+  chainId: number;
+  tradeContractAddress: string;
+  tradeContractAbi: string[];
+};
+
+export const BASE_CHAIN_CONFIGS: Record<"mainnet" | "testnet", EvmChainConfig> =
+  {
+    mainnet: {
+      rpcUrl: process.env.BASE_RPC_URL || "https://mainnet.base.org",
+      chainId: Number(process.env.BASE_CHAIN_ID || 8453),
+      tradeContractAddress: process.env.BASE_TRADE_CONTRACT_ADDRESS || "",
+      tradeContractAbi: [
+        "function openTrade(address collateralToken,uint256 collateralAmount,string targetToken,uint8 tradeDirection,uint256 leverage,uint256 stopLoss,uint256 takeProfit,uint256 limitPrice) returns (bytes32)",
+        "function closeTrade(uint256 tradeId) returns (bytes32)",
+        "function cancelTrade(uint256 tradeId) returns (bytes32)",
+      ],
+    },
+    testnet: {
+      rpcUrl:
+        process.env.BASE_TESTNET_RPC_URL ||
+        process.env.BASE_RPC_URL ||
+        "https://sepolia.base.org",
+      chainId: Number(
+        process.env.BASE_TESTNET_CHAIN_ID ||
+          process.env.BASE_CHAIN_ID ||
+          84532
+      ),
+      tradeContractAddress:
+        process.env.BASE_TESTNET_TRADE_CONTRACT_ADDRESS ||
+        process.env.BASE_TRADE_CONTRACT_ADDRESS ||
+        "",
+      tradeContractAbi: [
+        "function openTrade(address collateralToken,uint256 collateralAmount,string targetToken,uint8 tradeDirection,uint256 leverage,uint256 stopLoss,uint256 takeProfit,uint256 limitPrice) returns (bytes32)",
+        "function closeTrade(uint256 tradeId) returns (bytes32)",
+        "function cancelTrade(uint256 tradeId) returns (bytes32)",
+      ],
+    },
+  };
+
+export const BASE_TOKEN_ADDRESSES: Record<
+  "mainnet" | "testnet",
+  { [key: string]: string }
+> = {
+  mainnet: {
+    uusdc: process.env.BASE_USDC_ADDRESS || "",
+    atom: process.env.BASE_ATOM_ADDRESS || "",
+  },
+  testnet: {
+    uusdc:
+      process.env.BASE_TESTNET_USDC_ADDRESS ||
+      process.env.BASE_USDC_ADDRESS ||
+      "",
+    atom:
+      process.env.BASE_TESTNET_ATOM_ADDRESS ||
+      process.env.BASE_ATOM_ADDRESS ||
+      "",
+  },
+};
+
+export const DEFAULT_BASE_DECIMALS: { [key: string]: number } = {
+  uusdc: 6,
+  atom: 6,
+};
+
 export const DEFAULT_GTT = 120;
 export const LIMIT_GTT = 2419000; // 28 days in seconds
 export const GOOD_TIL_BLOCK_BUFFER = 10;
